@@ -1,0 +1,2 @@
+id,nombre,cif_nif,sector,plan,max_usuarios,created_at,anio_calculo_activo
+org_001,Empresa Demo S.A.,B12345678,Información y comunicaciones,pro,10,2025-01-10T00:00:00Z,2024

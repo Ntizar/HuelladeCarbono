@@ -1,0 +1,721 @@
+{
+  "version": "V.31",
+  "fuente": "MITECO - Ministerio para la Transición Ecológica y el Reto Demográfico",
+  "pca_ar6": {
+    "CH4": 27.9,
+    "N2O": 273,
+    "descripcion": "Potenciales de Calentamiento Global del Sexto Informe de Evaluación (AR6) del IPCC"
+  },
+  "anios_disponibles": [
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "combustibles_instalaciones_fijas": {
+    "gas_natural_kWhPCS": {
+      "nombre": "Gas natural (kWh PCS)",
+      "unidad": "kWh PCS",
+      "factores": {
+        "2024": {
+          "co2_kg_ud": 0.182,
+          "ch4_g_ud": 0.004,
+          "n2o_g_ud": 0.001
+        },
+        "2023": {
+          "co2_kg_ud": 0.182,
+          "ch4_g_ud": 0.004,
+          "n2o_g_ud": 0.001
+        },
+        "2022": {
+          "co2_kg_ud": 0.182,
+          "ch4_g_ud": 0.004,
+          "n2o_g_ud": 0.001
+        },
+        "2021": {
+          "co2_kg_ud": 0.182,
+          "ch4_g_ud": 0.004,
+          "n2o_g_ud": 0.001
+        },
+        "2020": {
+          "co2_kg_ud": 0.182,
+          "ch4_g_ud": 0.004,
+          "n2o_g_ud": 0.001
+        }
+      }
+    },
+    "gas_natural_m3": {
+      "nombre": "Gas natural (m³)",
+      "unidad": "m³",
+      "factores": {
+        "2024": {
+          "co2_kg_ud": 2.016,
+          "ch4_g_ud": 0.044,
+          "n2o_g_ud": 0.008
+        },
+        "2023": {
+          "co2_kg_ud": 2.016,
+          "ch4_g_ud": 0.044,
+          "n2o_g_ud": 0.008
+        },
+        "2022": {
+          "co2_kg_ud": 2.016,
+          "ch4_g_ud": 0.044,
+          "n2o_g_ud": 0.008
+        }
+      }
+    },
+    "gasoleo_calefaccion_litros": {
+      "nombre": "Gasóleo calefacción (litros)",
+      "unidad": "litros",
+      "factores": {
+        "2024": {
+          "co2_kg_ud": 2.868,
+          "ch4_g_ud": 0.08,
+          "n2o_g_ud": 0.016
+        },
+        "2023": {
+          "co2_kg_ud": 2.868,
+          "ch4_g_ud": 0.08,
+          "n2o_g_ud": 0.016
+        },
+        "2022": {
+          "co2_kg_ud": 2.868,
+          "ch4_g_ud": 0.08,
+          "n2o_g_ud": 0.016
+        }
+      }
+    },
+    "glp_litros": {
+      "nombre": "GLP (litros)",
+      "unidad": "litros",
+      "factores": {
+        "2024": {
+          "co2_kg_ud": 1.612,
+          "ch4_g_ud": 0.023,
+          "n2o_g_ud": 0.023
+        },
+        "2023": {
+          "co2_kg_ud": 1.612,
+          "ch4_g_ud": 0.023,
+          "n2o_g_ud": 0.023
+        },
+        "2022": {
+          "co2_kg_ud": 1.612,
+          "ch4_g_ud": 0.023,
+          "n2o_g_ud": 0.023
+        }
+      }
+    },
+    "glp_kg": {
+      "nombre": "GLP (kg)",
+      "unidad": "kg",
+      "factores": {
+        "2024": {
+          "co2_kg_ud": 2.938,
+          "ch4_g_ud": 0.042,
+          "n2o_g_ud": 0.042
+        },
+        "2023": {
+          "co2_kg_ud": 2.938,
+          "ch4_g_ud": 0.042,
+          "n2o_g_ud": 0.042
+        }
+      }
+    },
+    "carbon_kg": {
+      "nombre": "Carbón (kg)",
+      "unidad": "kg",
+      "factores": {
+        "2024": {
+          "co2_kg_ud": 2.533,
+          "ch4_g_ud": 0.028,
+          "n2o_g_ud": 0.057
+        },
+        "2023": {
+          "co2_kg_ud": 2.533,
+          "ch4_g_ud": 0.028,
+          "n2o_g_ud": 0.057
+        }
+      }
+    },
+    "biomasa_pellets_kg": {
+      "nombre": "Biomasa - Pellets (kg)",
+      "unidad": "kg",
+      "factores": {
+        "2024": {
+          "co2_kg_ud": 0.0,
+          "ch4_g_ud": 0.54,
+          "n2o_g_ud": 0.054
+        },
+        "2023": {
+          "co2_kg_ud": 0.0,
+          "ch4_g_ud": 0.54,
+          "n2o_g_ud": 0.054
+        }
+      }
+    },
+    "biomasa_astillas_kg": {
+      "nombre": "Biomasa - Astillas (kg)",
+      "unidad": "kg",
+      "factores": {
+        "2024": {
+          "co2_kg_ud": 0.0,
+          "ch4_g_ud": 1.08,
+          "n2o_g_ud": 0.054
+        },
+        "2023": {
+          "co2_kg_ud": 0.0,
+          "ch4_g_ud": 1.08,
+          "n2o_g_ud": 0.054
+        }
+      }
+    }
+  },
+  "combustibles_vehiculos_carretera": {
+    "gasolina_litros": {
+      "nombre": "Gasolina (litros)",
+      "unidad": "litros",
+      "por_categoria": {
+        "turismos_M1": {
+          "nombre": "Turismos (M1)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.238,
+              "n2o_g_ud": 0.025
+            },
+            "2023": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.238,
+              "n2o_g_ud": 0.025
+            },
+            "2022": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.238,
+              "n2o_g_ud": 0.025
+            }
+          }
+        },
+        "furgonetas_N1": {
+          "nombre": "Furgonetas (N1)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.316,
+              "n2o_g_ud": 0.062
+            },
+            "2023": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.316,
+              "n2o_g_ud": 0.062
+            }
+          }
+        },
+        "camiones_pesados_N2_N3": {
+          "nombre": "Camiones pesados (N2/N3)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.316,
+              "n2o_g_ud": 0.062
+            },
+            "2023": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.316,
+              "n2o_g_ud": 0.062
+            }
+          }
+        },
+        "autobuses_M2_M3": {
+          "nombre": "Autobuses (M2/M3)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.316,
+              "n2o_g_ud": 0.062
+            },
+            "2023": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.316,
+              "n2o_g_ud": 0.062
+            }
+          }
+        },
+        "motocicletas_L": {
+          "nombre": "Motocicletas (L)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.572,
+              "n2o_g_ud": 0.019
+            },
+            "2023": {
+              "co2_kg_ud": 2.196,
+              "ch4_g_ud": 0.572,
+              "n2o_g_ud": 0.019
+            }
+          }
+        }
+      }
+    },
+    "gasoleo_litros": {
+      "nombre": "Gasóleo (litros)",
+      "unidad": "litros",
+      "por_categoria": {
+        "turismos_M1": {
+          "nombre": "Turismos (M1)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 2.607,
+              "ch4_g_ud": 0.005,
+              "n2o_g_ud": 0.028
+            },
+            "2023": {
+              "co2_kg_ud": 2.607,
+              "ch4_g_ud": 0.005,
+              "n2o_g_ud": 0.028
+            },
+            "2022": {
+              "co2_kg_ud": 2.607,
+              "ch4_g_ud": 0.005,
+              "n2o_g_ud": 0.028
+            }
+          }
+        },
+        "furgonetas_N1": {
+          "nombre": "Furgonetas (N1)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 2.607,
+              "ch4_g_ud": 0.005,
+              "n2o_g_ud": 0.028
+            },
+            "2023": {
+              "co2_kg_ud": 2.607,
+              "ch4_g_ud": 0.005,
+              "n2o_g_ud": 0.028
+            }
+          }
+        },
+        "camiones_pesados_N2_N3": {
+          "nombre": "Camiones pesados (N2/N3)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 2.607,
+              "ch4_g_ud": 0.01,
+              "n2o_g_ud": 0.107
+            },
+            "2023": {
+              "co2_kg_ud": 2.607,
+              "ch4_g_ud": 0.01,
+              "n2o_g_ud": 0.107
+            }
+          }
+        },
+        "autobuses_M2_M3": {
+          "nombre": "Autobuses (M2/M3)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 2.607,
+              "ch4_g_ud": 0.01,
+              "n2o_g_ud": 0.107
+            },
+            "2023": {
+              "co2_kg_ud": 2.607,
+              "ch4_g_ud": 0.01,
+              "n2o_g_ud": 0.107
+            }
+          }
+        }
+      }
+    },
+    "glp_litros_vehiculos": {
+      "nombre": "GLP vehículos (litros)",
+      "unidad": "litros",
+      "por_categoria": {
+        "turismos_M1": {
+          "nombre": "Turismos (M1)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 1.612,
+              "ch4_g_ud": 0.572,
+              "n2o_g_ud": 0.019
+            },
+            "2023": {
+              "co2_kg_ud": 1.612,
+              "ch4_g_ud": 0.572,
+              "n2o_g_ud": 0.019
+            }
+          }
+        }
+      }
+    },
+    "gas_natural_vehiculos_kWh": {
+      "nombre": "Gas natural vehículos (kWh)",
+      "unidad": "kWh",
+      "por_categoria": {
+        "turismos_M1": {
+          "nombre": "Turismos (M1)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 0.182,
+              "ch4_g_ud": 1.349,
+              "n2o_g_ud": 0.019
+            },
+            "2023": {
+              "co2_kg_ud": 0.182,
+              "ch4_g_ud": 1.349,
+              "n2o_g_ud": 0.019
+            }
+          }
+        }
+      }
+    },
+    "km_gasolina": {
+      "nombre": "Distancia gasolina (km)",
+      "unidad": "km",
+      "por_categoria": {
+        "turismos_M1": {
+          "nombre": "Turismos (M1)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 0.148,
+              "ch4_g_ud": 0.016,
+              "n2o_g_ud": 0.002
+            },
+            "2023": {
+              "co2_kg_ud": 0.148,
+              "ch4_g_ud": 0.016,
+              "n2o_g_ud": 0.002
+            }
+          }
+        },
+        "furgonetas_N1": {
+          "nombre": "Furgonetas (N1)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 0.186,
+              "ch4_g_ud": 0.027,
+              "n2o_g_ud": 0.005
+            },
+            "2023": {
+              "co2_kg_ud": 0.186,
+              "ch4_g_ud": 0.027,
+              "n2o_g_ud": 0.005
+            }
+          }
+        }
+      }
+    },
+    "km_gasoleo": {
+      "nombre": "Distancia gasóleo (km)",
+      "unidad": "km",
+      "por_categoria": {
+        "turismos_M1": {
+          "nombre": "Turismos (M1)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 0.153,
+              "ch4_g_ud": 0.0,
+              "n2o_g_ud": 0.002
+            },
+            "2023": {
+              "co2_kg_ud": 0.153,
+              "ch4_g_ud": 0.0,
+              "n2o_g_ud": 0.002
+            }
+          }
+        },
+        "furgonetas_N1": {
+          "nombre": "Furgonetas (N1)",
+          "factores": {
+            "2024": {
+              "co2_kg_ud": 0.195,
+              "ch4_g_ud": 0.0,
+              "n2o_g_ud": 0.002
+            },
+            "2023": {
+              "co2_kg_ud": 0.195,
+              "ch4_g_ud": 0.0,
+              "n2o_g_ud": 0.002
+            }
+          }
+        }
+      }
+    }
+  },
+  "gases_refrigerantes_pca": {
+    "R-134a": {
+      "formula": "CH2FCF3",
+      "pca": 1530,
+      "nombre": "R-134a (HFC)"
+    },
+    "R-410A": {
+      "formula": "R410A",
+      "pca": 2088,
+      "nombre": "R-410A (mezcla HFC)"
+    },
+    "R-407C": {
+      "formula": "R407C",
+      "pca": 1774,
+      "nombre": "R-407C (mezcla HFC)"
+    },
+    "R-404A": {
+      "formula": "R404A",
+      "pca": 3922,
+      "nombre": "R-404A (mezcla HFC)"
+    },
+    "R-507A": {
+      "formula": "R507A",
+      "pca": 3985,
+      "nombre": "R-507A (mezcla HFC)"
+    },
+    "R-32": {
+      "formula": "CH2F2",
+      "pca": 771,
+      "nombre": "R-32 (HFC)"
+    },
+    "R-125": {
+      "formula": "C2HF5",
+      "pca": 3740,
+      "nombre": "R-125 (HFC)"
+    },
+    "R-143a": {
+      "formula": "C2H3F3",
+      "pca": 5810,
+      "nombre": "R-143a (HFC)"
+    },
+    "R-227ea": {
+      "formula": "C3HF7",
+      "pca": 3600,
+      "nombre": "R-227ea (HFC)"
+    },
+    "R-245fa": {
+      "formula": "C3H3F5",
+      "pca": 1030,
+      "nombre": "R-245fa (HFC)"
+    },
+    "R-236fa": {
+      "formula": "C3H2F6",
+      "pca": 8690,
+      "nombre": "R-236fa (HFC)"
+    },
+    "R-422D": {
+      "formula": "R422D",
+      "pca": 2729,
+      "nombre": "R-422D (mezcla HFC)"
+    },
+    "R-417A": {
+      "formula": "R417A",
+      "pca": 2346,
+      "nombre": "R-417A (mezcla HFC)"
+    },
+    "R-290": {
+      "formula": "C3H8",
+      "pca": 0.02,
+      "nombre": "R-290 Propano (HC)"
+    },
+    "R-600a": {
+      "formula": "C4H10",
+      "pca": 0.02,
+      "nombre": "R-600a Isobutano (HC)"
+    },
+    "R-744": {
+      "formula": "CO2",
+      "pca": 1,
+      "nombre": "R-744 CO2"
+    },
+    "R-717": {
+      "formula": "NH3",
+      "pca": 0,
+      "nombre": "R-717 Amoniaco"
+    },
+    "SF6": {
+      "formula": "SF6",
+      "pca": 25200,
+      "nombre": "Hexafluoruro de azufre"
+    },
+    "HFC-23": {
+      "formula": "CHF3",
+      "pca": 14800,
+      "nombre": "HFC-23"
+    },
+    "NF3": {
+      "formula": "NF3",
+      "pca": 17200,
+      "nombre": "Trifluoruro de nitrógeno"
+    }
+  },
+  "mix_electrico_comercializadoras": {
+    "mix_nacional": {
+      "nombre": "Mix eléctrico peninsular (sin GdO)",
+      "factores_kg_co2_kwh": {
+        "2024": 0.12,
+        "2023": 0.127,
+        "2022": 0.144,
+        "2021": 0.151,
+        "2020": 0.122,
+        "2019": 0.157,
+        "2018": 0.208,
+        "2017": 0.245,
+        "2016": 0.225,
+        "2015": 0.265,
+        "2014": 0.267,
+        "2013": 0.248,
+        "2012": 0.309,
+        "2011": 0.267,
+        "2010": 0.218,
+        "2009": 0.29,
+        "2008": 0.338,
+        "2007": 0.372
+      }
+    },
+    "iberdrola": {
+      "nombre": "Iberdrola (sin GdO)",
+      "factores_kg_co2_kwh": {
+        "2024": 0.07,
+        "2023": 0.075,
+        "2022": 0.09
+      }
+    },
+    "endesa": {
+      "nombre": "Endesa (sin GdO)",
+      "factores_kg_co2_kwh": {
+        "2024": 0.1,
+        "2023": 0.11,
+        "2022": 0.13
+      }
+    },
+    "naturgy": {
+      "nombre": "Naturgy (sin GdO)",
+      "factores_kg_co2_kwh": {
+        "2024": 0.14,
+        "2023": 0.15,
+        "2022": 0.17
+      }
+    },
+    "repsol": {
+      "nombre": "Repsol (sin GdO)",
+      "factores_kg_co2_kwh": {
+        "2024": 0.18,
+        "2023": 0.19,
+        "2022": 0.2
+      }
+    },
+    "edp": {
+      "nombre": "EDP (sin GdO)",
+      "factores_kg_co2_kwh": {
+        "2024": 0.09,
+        "2023": 0.095,
+        "2022": 0.11
+      }
+    },
+    "totalenergies": {
+      "nombre": "TotalEnergies (sin GdO)",
+      "factores_kg_co2_kwh": {
+        "2024": 0.16,
+        "2023": 0.17
+      }
+    },
+    "con_garantia_origen": {
+      "nombre": "Con Garantía de Origen (GdO) - cualquier comercializadora",
+      "factores_kg_co2_kwh": {
+        "2024": 0.0,
+        "2023": 0.0,
+        "2022": 0.0,
+        "2021": 0.0,
+        "2020": 0.0,
+        "2019": 0.0,
+        "2018": 0.0,
+        "2017": 0.0,
+        "2016": 0.0,
+        "2015": 0.0,
+        "2014": 0.0,
+        "2013": 0.0,
+        "2012": 0.0,
+        "2011": 0.0,
+        "2010": 0.0,
+        "2009": 0.0,
+        "2008": 0.0,
+        "2007": 0.0
+      }
+    }
+  },
+  "transporte_no_carretera": {
+    "ferroviario": {
+      "nombre": "Transporte ferroviario",
+      "unidad": "km",
+      "factores": {
+        "2024": {
+          "co2_kg_km": 0.026
+        },
+        "2023": {
+          "co2_kg_km": 0.028
+        }
+      }
+    },
+    "maritimo_carga": {
+      "nombre": "Transporte marítimo de carga",
+      "unidad": "t·km",
+      "factores": {
+        "2024": {
+          "co2_kg_tkm": 0.016
+        },
+        "2023": {
+          "co2_kg_tkm": 0.016
+        }
+      }
+    },
+    "aereo_nacional": {
+      "nombre": "Transporte aéreo nacional",
+      "unidad": "km",
+      "factores": {
+        "2024": {
+          "co2_kg_km": 0.163
+        },
+        "2023": {
+          "co2_kg_km": 0.165
+        }
+      }
+    },
+    "aereo_internacional_corto": {
+      "nombre": "Transporte aéreo internacional corto (<3700 km)",
+      "unidad": "km",
+      "factores": {
+        "2024": {
+          "co2_kg_km": 0.097
+        },
+        "2023": {
+          "co2_kg_km": 0.099
+        }
+      }
+    },
+    "aereo_internacional_largo": {
+      "nombre": "Transporte aéreo internacional largo (>3700 km)",
+      "unidad": "km",
+      "factores": {
+        "2024": {
+          "co2_kg_km": 0.112
+        },
+        "2023": {
+          "co2_kg_km": 0.114
+        }
+      }
+    }
+  }
+}
