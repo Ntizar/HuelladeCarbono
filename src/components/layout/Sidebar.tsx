@@ -76,11 +76,11 @@ export default function Sidebar() {
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-sm font-bold">
-            D
+            DA
           </div>
           <div>
-            <p className="text-sm font-medium text-white">Demo Admin</p>
-            <p className="text-xs text-gray-400">Plan Pro</p>
+            <p className="text-sm font-medium text-white">David Antizar</p>
+            <p className="text-xs text-gray-400">Desarrollador</p>
           </div>
         </div>
       </div>

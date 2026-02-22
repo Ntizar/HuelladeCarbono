@@ -23,12 +23,19 @@ export class ValidationAgent {
     const errors: ValidationResult['errors'] = [];
     const factors = loadEmissionFactors();
     
-    // Verificar que el año de cálculo existe en los factores de emisión
-    if (factors && !factors.anios_disponibles.includes(event.anio)) {
+    // Verificar que el año de cálculo es razonable (2007-2027)
+    // Si el año no tiene factores exactos, se usarán los del último año disponible
+    if (event.anio < 2007 || event.anio > 2027) {
       errors.push({
         field: 'anio',
-        message: `El año ${event.anio} no está disponible en los factores de emisión (${factors.anios_disponibles[0]}-${factors.anios_disponibles[factors.anios_disponibles.length - 1]})`,
+        message: `El año ${event.anio} está fuera del rango permitido (2007-2027)`,
         severity: 'error',
+      });
+    } else if (factors && !factors.anios_disponibles.includes(event.anio)) {
+      errors.push({
+        field: 'anio',
+        message: `El año ${event.anio} no tiene factores de emisión propios. Se usarán los del último año disponible (${factors.anios_disponibles[factors.anios_disponibles.length - 1]}).`,
+        severity: 'warning',
       });
     }
     

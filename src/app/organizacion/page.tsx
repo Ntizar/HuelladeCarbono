@@ -70,7 +70,7 @@ const TIPOS_ORGANIZACION_FALLBACK = [
   'Otra',
 ];
 
-const ANIOS_FALLBACK = Array.from({ length: 2024 - 2007 + 1 }, (_, i) => 2007 + i);
+const ANIOS_FALLBACK = Array.from({ length: 2027 - 2007 + 1 }, (_, i) => 2007 + i);
 
 /* ================================================================== */
 /*  Componente principal                                               */

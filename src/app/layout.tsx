@@ -30,10 +30,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Sidebar />
-        <main className="ml-64 min-h-screen">
-          <div className="p-8">
+        <main className="ml-64 min-h-screen flex flex-col">
+          <div className="p-8 flex-1">
             {children}
           </div>
+          <footer className="px-8 py-4 border-t border-gray-200 text-center text-xs text-gray-400">
+            Desarrollado por <span className="font-medium text-gray-600">David Antizar</span> · Calculadora MITECO V.31
+          </footer>
         </main>
       </body>
     </html>

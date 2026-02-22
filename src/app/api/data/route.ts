@@ -34,6 +34,10 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(jsonStore.loadScope2Electricidad(orgId, anio));
       case 'results':
         return NextResponse.json(jsonStore.loadResults(orgId, anio));
+      case 'sedes':
+        return NextResponse.json(jsonStore.loadSedes(orgId, anio) || { sedes: [] });
+      case 'all_raw':
+        return NextResponse.json(jsonStore.loadAllOrgData(orgId, anio));
       case 'factors':
         return NextResponse.json(jsonStore.loadEmissionFactors());
       case 'dropdowns':
@@ -113,6 +117,15 @@ export async function POST(request: NextRequest) {
         break;
       }
       
+      case 'sedes': {
+        const currentSedes = jsonStore.loadSedes(orgId, anio) || { sedes: [] };
+        if (data?.sede) {
+          currentSedes.sedes.push(data.sede);
+          jsonStore.saveSedes(orgId, anio, currentSedes);
+        }
+        return NextResponse.json({ success: true, sedes: currentSedes.sedes });
+      }
+
       case 'initialize':
         jsonStore.initializeOrgYear(orgId, anio);
         break;

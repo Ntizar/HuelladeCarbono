@@ -11,6 +11,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import SedeSelector from '@/components/shared/SedeSelector';
 
 interface InstalacionFija {
   id: string;
@@ -30,6 +31,17 @@ interface FactoresMap {
   };
 }
 
+/** Busca el factor para el año dado, o el del último año disponible */
+function getFactorForYear(factorObj: FactoresMap[string] | undefined, anio: number) {
+  if (!factorObj?.factores) return { co2_kg_ud: 0, ch4_g_ud: 0, n2o_g_ud: 0 };
+  const fe = factorObj.factores[String(anio)];
+  if (fe) return fe;
+  // Buscar el último año disponible
+  const years = Object.keys(factorObj.factores).map(Number).sort((a, b) => a - b);
+  const nearest = years.filter(y => y <= anio).pop() || years[years.length - 1];
+  return factorObj.factores[String(nearest)] || { co2_kg_ud: 0, ch4_g_ud: 0, n2o_g_ud: 0 };
+}
+
 export default function InstalacionesFijasPage() {
   const [instalaciones, setInstalaciones] = useState<InstalacionFija[]>([]);
   const [factores, setFactores] = useState<FactoresMap>({});
@@ -37,6 +49,7 @@ export default function InstalacionesFijasPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [anio] = useState(2024);
   
   // Form state
   const [edificio, setEdificio] = useState('');
@@ -85,7 +98,7 @@ export default function InstalacionesFijasPage() {
     
     setSaving(true);
     const key = getCombustibleKey(combustible);
-    const fe = factores[key]?.factores?.['2024'] || { co2_kg_ud: 0, ch4_g_ud: 0, n2o_g_ud: 0 };
+    const fe = getFactorForYear(factores[key], anio);
     
     try {
       const res = await fetch('/api/data', {
@@ -159,14 +172,7 @@ export default function InstalacionesFijasPage() {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Añadir consumo de combustible</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="form-label">Edificio / Sede</label>
-            <input
-              type="text"
-              value={edificio}
-              onChange={(e) => setEdificio(e.target.value)}
-              className="form-input"
-              placeholder="Sede Central"
-            />
+            <SedeSelector value={edificio} onChange={setEdificio} />
           </div>
           <div>
             <label className="form-label">Tipo de combustible</label>
@@ -202,11 +208,11 @@ export default function InstalacionesFijasPage() {
         
         {combustible && (
           <div className="mt-3 text-xs text-gray-500">
-            Factor de emisión ({combustible}, 2024):{' '}
+            Factor de emisión ({combustible}, {anio}):{' '}
             {(() => {
               const key = getCombustibleKey(combustible);
-              const fe = factores[key]?.factores?.['2024'];
-              return fe ? `CO₂: ${fe.co2_kg_ud} kg/ud · CH₄: ${fe.ch4_g_ud} g/ud · N₂O: ${fe.n2o_g_ud} g/ud` : 'No disponible';
+              const fe = getFactorForYear(factores[key], anio);
+              return fe.co2_kg_ud ? `CO₂: ${fe.co2_kg_ud} kg/ud · CH₄: ${fe.ch4_g_ud} g/ud · N₂O: ${fe.n2o_g_ud} g/ud` : 'No disponible';
             })()}
           </div>
         )}

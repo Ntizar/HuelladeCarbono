@@ -221,6 +221,25 @@ export function loadScope2Electricidad(
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// SEDES / CENTROS DE TRABAJO
+// ═══════════════════════════════════════════════════════════════════
+
+export interface SedeRecord {
+  id: string;
+  nombre: string;
+  direccion?: string;
+}
+
+export function saveSedes(orgId: string, anio: number, data: { sedes: SedeRecord[] }): void {
+  const dir = getOrgYearDir(orgId, anio);
+  writeJSON(path.join(dir, 'sedes.json'), data);
+}
+
+export function loadSedes(orgId: string, anio: number): { sedes: SedeRecord[] } | null {
+  return readJSON<{ sedes: SedeRecord[] }>(path.join(getOrgYearDir(orgId, anio), 'sedes.json'));
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // RESULTADOS (Pestaña 9)
 // ═══════════════════════════════════════════════════════════════════
 

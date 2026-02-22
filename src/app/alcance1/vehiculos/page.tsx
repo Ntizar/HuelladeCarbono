@@ -11,6 +11,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import SedeSelector from '@/components/shared/SedeSelector';
 
 interface VehiculoEntry {
   id: string;
@@ -96,8 +97,7 @@ export default function VehiculosPage() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
-            <label className="form-label">Edificio / Sede</label>
-            <input type="text" value={edificio} onChange={e => setEdificio(e.target.value)} className="form-input" placeholder="Sede Central" />
+            <SedeSelector value={edificio} onChange={setEdificio} />
           </div>
           <div>
             <label className="form-label">Combustible</label>

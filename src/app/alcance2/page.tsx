@@ -10,6 +10,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import SedeSelector from '@/components/shared/SedeSelector';
 
 interface ElectricidadEntry {
   id: string;
@@ -137,8 +138,7 @@ export default function Alcance2Page() {
         <h2 className="text-lg font-semibold mb-4">Añadir consumo eléctrico</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
-            <label className="form-label">Edificio / Sede *</label>
-            <input type="text" value={edificio} onChange={e => setEdificio(e.target.value)} className="form-input" placeholder="Oficina Madrid" />
+            <SedeSelector value={edificio} onChange={setEdificio} />
           </div>
           <div>
             <label className="form-label">Comercializadora *</label>
