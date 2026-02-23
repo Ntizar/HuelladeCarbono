@@ -9,7 +9,7 @@
  * - CIF/NIF con formato correcto
  */
 
-import { loadEmissionFactors, loadDropdowns } from '@/lib/db/json-store';
+import { loadEmissionFactors, loadDropdowns } from '@/lib/db/pg-store';
 import type { DataChangeEvent, ValidationResult } from '@/types/hc-schemas';
 
 /**

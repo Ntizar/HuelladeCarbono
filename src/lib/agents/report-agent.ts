@@ -8,7 +8,7 @@
  */
 
 import ExcelJS from 'exceljs';
-import { loadAllOrgData, loadOrganization, loadResults } from '@/lib/db/json-store';
+import { loadAllOrgData, loadOrganization, loadResults } from '@/lib/db/pg-store';
 import type { Resultados, Organizacion } from '@/types/hc-schemas';
 
 /**
@@ -19,9 +19,9 @@ export class ReportAgent {
    * Genera un informe Excel compatible con el formato MITECO
    */
   async generateExcel(orgId: string, anio: number): Promise<Buffer> {
-    const org = loadOrganization(orgId, anio);
-    const results = loadResults(orgId, anio);
-    const allData = loadAllOrgData(orgId, anio);
+    const org = await loadOrganization(orgId, anio);
+    const results = await loadResults(orgId, anio);
+    const allData = await loadAllOrgData(orgId, anio);
     
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'SaaS Huella de Carbono';
@@ -169,7 +169,7 @@ export class ReportAgent {
    * Genera datos CSV de todos los registros de la organización
    */
   async generateCSV(orgId: string, anio: number): Promise<string> {
-    const allData = loadAllOrgData(orgId, anio);
+    const allData = await loadAllOrgData(orgId, anio);
     const lines: string[] = [];
     
     lines.push('categoria,subcategoria,edificio_sede,detalle,cantidad,unidad,emisiones_kg_co2e');
@@ -213,8 +213,8 @@ export class ReportAgent {
     generatedAt: string;
   }> {
     return {
-      org: loadOrganization(orgId, anio),
-      results: loadResults(orgId, anio),
+      org: await loadOrganization(orgId, anio),
+      results: await loadResults(orgId, anio),
       generatedAt: new Date().toISOString(),
     };
   }

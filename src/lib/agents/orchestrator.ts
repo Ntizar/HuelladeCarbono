@@ -16,7 +16,7 @@ import { auditAgent } from './audit-agent';
 import { calcAgent } from './calc-agent';
 import { validationAgent } from './validation-agent';
 import type { DataChangeEvent, Resultados, ValidationResult } from '@/types/hc-schemas';
-import { loadResults } from '@/lib/db/json-store';
+import { loadResults } from '@/lib/db/pg-store';
 
 class ValidationError extends Error {
   errors: ValidationResult['errors'];
@@ -151,7 +151,7 @@ export class HCOrchestrator {
     const alerts: string[] = [];
     
     // Cargar resultados del año anterior para comparar
-    const previousResults = loadResults(orgId, anio - 1);
+    const previousResults = await loadResults(orgId, anio - 1);
     
     if (previousResults && previousResults.total_alcance_1_2_t_co2e > 0) {
       const previousTotal = previousResults.total_alcance_1_2_t_co2e;

@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "@react-pdf/renderer": "^4.3.2",
     "bcryptjs": "^3.0.3",
+    "dotenv": "^17.3.1",
     "exceljs": "^4.4.0",
     "next": "14.2.35",
     "next-auth": "^4.24.13",
@@ -29,6 +31,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^11.0.0",
+    "docx": "^9.5.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "postcss": "^8",

@@ -37,7 +37,7 @@ import {
   loadScope2Electricidad,
   loadOrganization,
   saveResults,
-} from '@/lib/db/json-store';
+} from '@/lib/db/pg-store';
 
 // ═══════════════════════════════════════════════════════════════════
 // FUNCIONES DE CÁLCULO INDIVIDUAL
@@ -254,15 +254,17 @@ export class CalcAgent {
   async recalculate(params: RecalculateParams): Promise<Resultados> {
     const { orgId, anio, scope: _scope = 'both' } = params;
     
-    // Cargar datos de la organización
-    const org = loadOrganization(orgId, anio);
+    // Cargar datos de la organización (ahora async — PostgreSQL)
+    const org = await loadOrganization(orgId, anio);
     
-    // Cargar datos de emisiones
-    const scope1Fijas = loadScope1InstalacionesFijas(orgId, anio);
-    const scope1Vehiculos = loadScope1Vehiculos(orgId, anio);
-    const scope1Fugitivas = loadScope1Fugitivas(orgId, anio);
-    const scope1Proceso = loadScope1Proceso(orgId, anio);
-    const scope2Data = loadScope2Electricidad(orgId, anio);
+    // Cargar datos de emisiones en paralelo
+    const [scope1Fijas, scope1Vehiculos, scope1Fugitivas, scope1Proceso, scope2Data] = await Promise.all([
+      loadScope1InstalacionesFijas(orgId, anio),
+      loadScope1Vehiculos(orgId, anio),
+      loadScope1Fugitivas(orgId, anio),
+      loadScope1Proceso(orgId, anio),
+      loadScope2Electricidad(orgId, anio),
+    ]);
     
     // ─── Calcular Alcance 1 ─────────────────────────────
     const fijas = calcularAlcance1InstalacionesFijas(scope1Fijas);
@@ -319,8 +321,8 @@ export class CalcAgent {
       },
     };
     
-    // Guardar resultados
-    saveResults(orgId, anio, resultados);
+    // Guardar resultados (async — PostgreSQL)
+    await saveResults(orgId, anio, resultados);
     
     return resultados;
   }

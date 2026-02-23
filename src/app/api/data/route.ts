@@ -4,13 +4,28 @@
  * CRUD para datos de huella de carbono por organización.
  * Cada operación pasa por el agente orquestador para validación,
  * cálculo automático y registro en auditoría.
+ * 
+ * Almacenamiento: PostgreSQL en Neon (free tier con HARD BLOCK a 400 MB).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { orchestrator } from '@/lib/agents/orchestrator';
-import * as jsonStore from '@/lib/db/json-store';
+import * as pgStore from '@/lib/db/pg-store';
+import { FreeTierBlockedError } from '@/lib/db/pg-store';
+import { getUsageInfo } from '@/lib/db/free-tier-guard';
 import { v4 as uuidv4 } from 'uuid';
 import { calcularEmisionesCombustible, calcularEmisionesFugitivas, calcularEmisionesElectricidad } from '@/lib/agents/calc-agent';
+
+/** Helper: respuesta de error con código apropiado */
+function errorResponse(error: any) {
+  if (error instanceof FreeTierBlockedError) {
+    return NextResponse.json(
+      { error: error.message, code: 'FREE_TIER_EXCEEDED' },
+      { status: 507 }
+    );
+  }
+  return NextResponse.json({ error: error.message }, { status: 500 });
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -21,35 +36,37 @@ export async function GET(request: NextRequest) {
   try {
     switch (tipo) {
       case 'organization':
-        return NextResponse.json(jsonStore.loadOrganization(orgId, anio));
+        return NextResponse.json(await pgStore.loadOrganization(orgId, anio));
       case 'scope1_instalaciones':
-        return NextResponse.json(jsonStore.loadScope1InstalacionesFijas(orgId, anio));
+        return NextResponse.json(await pgStore.loadScope1InstalacionesFijas(orgId, anio));
       case 'scope1_vehiculos':
-        return NextResponse.json(jsonStore.loadScope1Vehiculos(orgId, anio));
+        return NextResponse.json(await pgStore.loadScope1Vehiculos(orgId, anio));
       case 'scope1_fugitivas':
-        return NextResponse.json(jsonStore.loadScope1Fugitivas(orgId, anio));
+        return NextResponse.json(await pgStore.loadScope1Fugitivas(orgId, anio));
       case 'scope1_proceso':
-        return NextResponse.json(jsonStore.loadScope1Proceso(orgId, anio));
+        return NextResponse.json(await pgStore.loadScope1Proceso(orgId, anio));
       case 'scope2':
-        return NextResponse.json(jsonStore.loadScope2Electricidad(orgId, anio));
+        return NextResponse.json(await pgStore.loadScope2Electricidad(orgId, anio));
       case 'results':
-        return NextResponse.json(jsonStore.loadResults(orgId, anio));
+        return NextResponse.json(await pgStore.loadResults(orgId, anio));
       case 'sedes':
-        return NextResponse.json(jsonStore.loadSedes(orgId, anio) || { sedes: [] });
+        return NextResponse.json((await pgStore.loadSedes(orgId, anio)) || { sedes: [] });
       case 'all_raw':
-        return NextResponse.json(jsonStore.loadAllOrgData(orgId, anio));
+        return NextResponse.json(await pgStore.loadAllOrgData(orgId, anio));
       case 'factors':
-        return NextResponse.json(jsonStore.loadEmissionFactors());
+        return NextResponse.json(pgStore.loadEmissionFactors());
       case 'dropdowns':
-        return NextResponse.json(jsonStore.loadDropdowns());
+        return NextResponse.json(pgStore.loadDropdowns());
       case 'years':
-        return NextResponse.json(jsonStore.listOrgYears(orgId));
+        return NextResponse.json(await pgStore.listOrgYears(orgId));
+      case 'usage':
+        return NextResponse.json(await getUsageInfo());
       case 'all':
       default:
-        return NextResponse.json(jsonStore.loadAllOrgData(orgId, anio));
+        return NextResponse.json(await pgStore.loadAllOrgData(orgId, anio));
     }
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return errorResponse(error);
   }
 }
 
@@ -59,15 +76,15 @@ export async function POST(request: NextRequest) {
     const { orgId = 'org_001', anio = 2024, tipo, data, userId = 'usr_001' } = body;
     
     // Inicializar estructura si es la primera vez
-    jsonStore.initializeOrgYear(orgId, anio);
+    await pgStore.initializeOrgYear(orgId, anio);
     
     switch (tipo) {
       case 'organization':
-        jsonStore.saveOrganization(orgId, anio, { ...data, id: data.id || uuidv4() });
+        await pgStore.saveOrganization(orgId, anio, { ...data, id: data.id || uuidv4() });
         break;
         
       case 'scope1_instalacion_fija': {
-        const current = jsonStore.loadScope1InstalacionesFijas(orgId, anio);
+        const current = await pgStore.loadScope1InstalacionesFijas(orgId, anio);
         if (current) {
           const newItem = {
             ...data,
@@ -80,13 +97,13 @@ export async function POST(request: NextRequest) {
             newItem.emisiones_totales_kg_co2e = calc.total_kg_co2e;
           }
           current.no_sujetas_ley_1_2005.push(newItem);
-          jsonStore.saveScope1InstalacionesFijas(orgId, anio, current);
+          await pgStore.saveScope1InstalacionesFijas(orgId, anio, current);
         }
         break;
       }
         
       case 'scope1_fugitiva': {
-        const current = jsonStore.loadScope1Fugitivas(orgId, anio);
+        const current = await pgStore.loadScope1Fugitivas(orgId, anio);
         if (current) {
           const newItem = {
             ...data,
@@ -94,13 +111,13 @@ export async function POST(request: NextRequest) {
             emisiones_kg_co2e: calcularEmisionesFugitivas(data.recarga_kg || 0, data.pca || 0),
           };
           current.climatizacion_refrigeracion.push(newItem);
-          jsonStore.saveScope1Fugitivas(orgId, anio, current);
+          await pgStore.saveScope1Fugitivas(orgId, anio, current);
         }
         break;
       }
       
       case 'scope2_electricidad': {
-        const current = jsonStore.loadScope2Electricidad(orgId, anio);
+        const current = await pgStore.loadScope2Electricidad(orgId, anio);
         if (current) {
           const newItem = {
             ...data,
@@ -112,22 +129,22 @@ export async function POST(request: NextRequest) {
             ),
           };
           current.electricidad_edificios.push(newItem);
-          jsonStore.saveScope2Electricidad(orgId, anio, current);
+          await pgStore.saveScope2Electricidad(orgId, anio, current);
         }
         break;
       }
       
       case 'sedes': {
-        const currentSedes = jsonStore.loadSedes(orgId, anio) || { sedes: [] };
+        const currentSedes = (await pgStore.loadSedes(orgId, anio)) || { sedes: [] };
         if (data?.sede) {
           currentSedes.sedes.push(data.sede);
-          jsonStore.saveSedes(orgId, anio, currentSedes);
+          await pgStore.saveSedes(orgId, anio, currentSedes);
         }
         return NextResponse.json({ success: true, sedes: currentSedes.sedes });
       }
 
       case 'initialize':
-        jsonStore.initializeOrgYear(orgId, anio);
+        await pgStore.initializeOrgYear(orgId, anio);
         break;
         
       default:
@@ -139,7 +156,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ success: true, results, alerts });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return errorResponse(error);
   }
 }
 
@@ -150,26 +167,26 @@ export async function DELETE(request: NextRequest) {
     
     switch (tipo) {
       case 'scope1_instalacion_fija': {
-        const current = jsonStore.loadScope1InstalacionesFijas(orgId, anio);
+        const current = await pgStore.loadScope1InstalacionesFijas(orgId, anio);
         if (current) {
           current.no_sujetas_ley_1_2005 = current.no_sujetas_ley_1_2005.filter(i => i.id !== itemId);
-          jsonStore.saveScope1InstalacionesFijas(orgId, anio, current);
+          await pgStore.saveScope1InstalacionesFijas(orgId, anio, current);
         }
         break;
       }
       case 'scope1_fugitiva': {
-        const current = jsonStore.loadScope1Fugitivas(orgId, anio);
+        const current = await pgStore.loadScope1Fugitivas(orgId, anio);
         if (current) {
           current.climatizacion_refrigeracion = current.climatizacion_refrigeracion.filter(i => i.id !== itemId);
-          jsonStore.saveScope1Fugitivas(orgId, anio, current);
+          await pgStore.saveScope1Fugitivas(orgId, anio, current);
         }
         break;
       }
       case 'scope2_electricidad': {
-        const current = jsonStore.loadScope2Electricidad(orgId, anio);
+        const current = await pgStore.loadScope2Electricidad(orgId, anio);
         if (current) {
           current.electricidad_edificios = current.electricidad_edificios.filter(i => i.id !== itemId);
-          jsonStore.saveScope2Electricidad(orgId, anio, current);
+          await pgStore.saveScope2Electricidad(orgId, anio, current);
         }
         break;
       }
@@ -179,6 +196,6 @@ export async function DELETE(request: NextRequest) {
     const { results, alerts } = await orchestrator.onCalculate(userId, orgId, anio);
     return NextResponse.json({ success: true, results, alerts });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return errorResponse(error);
   }
 }
