@@ -98,6 +98,16 @@ CREATE TABLE IF NOT EXISTS usage_control (
   blocked     BOOLEAN NOT NULL DEFAULT FALSE
 );
 
+-- ─── Datos estáticos (factores de emisión, dropdowns) ───────────
+-- Antes eran archivos locales. Ahora en la BBDD para acceso web.
+
+CREATE TABLE IF NOT EXISTS static_data (
+  key        TEXT PRIMARY KEY,           -- 'emission_factors' | 'dropdowns'
+  data       JSONB NOT NULL DEFAULT '{}',
+  version    TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- ─── Usuario demo inicial ───────────────────────────────────────
 -- Password: demo123 (bcrypt hash)
 INSERT INTO users (id, email, nombre, password_hash, role, org_id, plan)

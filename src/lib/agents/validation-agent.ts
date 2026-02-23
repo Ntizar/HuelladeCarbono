@@ -21,7 +21,7 @@ export class ValidationAgent {
    */
   async validate(event: DataChangeEvent): Promise<ValidationResult> {
     const errors: ValidationResult['errors'] = [];
-    const factors = loadEmissionFactors();
+    const factors = await loadEmissionFactors();
     
     // Verificar que el año de cálculo es razonable (2007-2027)
     // Si el año no tiene factores exactos, se usarán los del último año disponible
@@ -63,7 +63,7 @@ export class ValidationAgent {
     
     // Verificar que el tipo de combustible es válido
     if (event.field === 'tipo_combustible' && typeof event.newValue === 'string') {
-      const dropdowns = loadDropdowns();
+      const dropdowns = await loadDropdowns();
       if (dropdowns) {
         const validFuels = [
           ...dropdowns.tipos_combustible_fijo,

@@ -4,8 +4,8 @@
  * Reemplaza json-store.ts. Misma interfaz pública, pero los datos
  * van a la tabla org_year_data (JSONB) en vez de archivos JSON locales.
  * 
- * Los factores de emisión y dropdowns se mantienen como archivos locales
- * (no cambian, son estáticos, no tiene sentido gastar espacio en BBDD).
+ * Todos los datos (incluidos factores de emisión y dropdowns) están en
+ * PostgreSQL para acceso 100% cloud sin depender de archivos locales.
  * 
  * FLUJO DE ESCRITURA:
  *   1. checkWriteAllowed() → Si devuelve allowed=false, lanza error 507
@@ -13,8 +13,6 @@
  *   3. invalidateCache() para que el siguiente check sea fresco
  */
 
-import fs from 'fs';
-import path from 'path';
 import { query, queryOne } from './neon';
 import { checkWriteAllowed, invalidateCache } from './free-tier-guard';
 import type {
@@ -27,8 +25,6 @@ import type {
   EmissionFactors,
   Dropdowns,
 } from '@/types/hc-schemas';
-
-const DATA_DIR = path.join(process.cwd(), 'data');
 
 // ─── Error personalizado para bloqueo de free tier ──────────────
 
@@ -75,25 +71,35 @@ async function loadOrgData<T>(orgId: string, anio: number, tipo: string): Promis
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// FACTORES DE EMISIÓN (siguen como archivos locales — solo lectura)
+// FACTORES DE EMISIÓN Y DROPDOWNS (desde PostgreSQL — tabla static_data)
 // ═══════════════════════════════════════════════════════════════════
 
-function readJSON<T>(filePath: string): T | null {
-  try {
-    if (!fs.existsSync(filePath)) return null;
-    const content = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(content) as T;
-  } catch {
-    return null;
-  }
+// Caché en memoria para datos estáticos (no cambian en runtime)
+let _emissionFactorsCache: EmissionFactors | null | undefined = undefined;
+let _dropdownsCache: Dropdowns | null | undefined = undefined;
+
+export async function loadEmissionFactors(): Promise<EmissionFactors | null> {
+  if (_emissionFactorsCache !== undefined) return _emissionFactorsCache;
+  const row = await queryOne<{ data: EmissionFactors }>(
+    `SELECT data FROM static_data WHERE key = 'emission_factors'`
+  );
+  _emissionFactorsCache = row?.data || null;
+  return _emissionFactorsCache;
 }
 
-export function loadEmissionFactors(): EmissionFactors | null {
-  return readJSON<EmissionFactors>(path.join(DATA_DIR, 'emission_factors.json'));
+export async function loadDropdowns(): Promise<Dropdowns | null> {
+  if (_dropdownsCache !== undefined) return _dropdownsCache;
+  const row = await queryOne<{ data: Dropdowns }>(
+    `SELECT data FROM static_data WHERE key = 'dropdowns'`
+  );
+  _dropdownsCache = row?.data || null;
+  return _dropdownsCache;
 }
 
-export function loadDropdowns(): Dropdowns | null {
-  return readJSON<Dropdowns>(path.join(DATA_DIR, 'dropdowns.json'));
+/** Invalida la caché de datos estáticos (útil si se actualizan) */
+export function invalidateStaticCache(): void {
+  _emissionFactorsCache = undefined;
+  _dropdownsCache = undefined;
 }
 
 // ═══════════════════════════════════════════════════════════════════

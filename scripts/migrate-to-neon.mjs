@@ -2,7 +2,8 @@
  * Script de migración: JSON local → PostgreSQL (Neon)
  * 
  * Lee todos los datos existentes de data/orgs/ y store/ y los inserta
- * en la base de datos Neon. También ejecuta el schema.sql.
+ * en la base de datos Neon. También ejecuta el schema.sql y sube los
+ * datos estáticos (factores de emisión, dropdowns).
  * 
  * Uso:
  *   1. Configura DATABASE_URL en .env.local con tu connection string de Neon
@@ -26,35 +27,54 @@ const ROOT = path.join(__dirname, '..');
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
   console.error('❌ DATABASE_URL no está configurada en .env.local');
-  console.error('   Obtén tu connection string de: https://console.neon.tech/app/projects/orange-mountain-06310787');
+  console.error('   Obtén tu connection string de: https://console.neon.tech');
   console.error('   Formato: postgresql://user:pass@ep-xxx.region.aws.neon.tech/neondb?sslmode=require');
   process.exit(1);
 }
 
 const sql = neon(DATABASE_URL);
 
+// Helper: query con parámetros posicionales → sql.query()
+async function q(text, params = []) {
+  const result = await sql.query(text, params);
+  return result.rows || result;
+}
+
 async function runSchema() {
   console.log('📦 Ejecutando schema.sql...');
   const schemaPath = path.join(ROOT, 'src', 'lib', 'db', 'schema.sql');
   const schemaSql = fs.readFileSync(schemaPath, 'utf-8');
   
-  // Dividir por sentencias (separadas por ;)
-  const statements = schemaSql
-    .split(/;[\s]*\n/)
-    .map(s => s.trim())
-    .filter(s => s.length > 0 && !s.startsWith('--'));
+  // Eliminar comentarios de línea completa y líneas vacías, luego dividir por ;
+  const cleaned = schemaSql
+    .split('\n')
+    .map(line => {
+      const trimmed = line.trim();
+      // Eliminar líneas que son solo comentario (-- o ═)
+      if (trimmed.startsWith('--') || trimmed.startsWith('═')) return '';
+      return line;
+    })
+    .join('\n');
   
+  const statements = cleaned
+    .split(';')
+    .map(s => s.trim())
+    .filter(s => s.length > 5); // Ignorar fragmentos vacíos
+  
+  let created = 0;
   for (const stmt of statements) {
     try {
-      await sql(stmt);
+      await sql.query(stmt);
+      created++;
     } catch (err) {
-      // Ignorar errores de "already exists" (idempotente)
-      if (!err.message?.includes('already exists') && !err.message?.includes('duplicate')) {
-        console.warn(`  ⚠ ${err.message?.substring(0, 100)}`);
+      if (err.message?.includes('already exists') || err.message?.includes('duplicate')) {
+        created++; // ya existe = OK
+      } else {
+        console.warn(`  ⚠ ${err.message?.substring(0, 120)}`);
       }
     }
   }
-  console.log('  ✓ Schema creado');
+  console.log(`  ✓ Schema creado (${created} sentencias ejecutadas)`);
 }
 
 async function migrateOrgData() {
@@ -78,7 +98,6 @@ async function migrateOrgData() {
       const yearDir = path.join(orgDir, year);
       const anio = parseInt(year);
 
-      // Mapeo de archivos a tipo
       const fileMap = {
         'organization.json': 'organization',
         'scope1_instalaciones_fijas.json': 'scope1_instalaciones_fijas',
@@ -94,7 +113,7 @@ async function migrateOrgData() {
         if (fs.existsSync(filePath)) {
           try {
             const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-            await sql(
+            await q(
               `INSERT INTO org_year_data (org_id, anio, tipo, data)
                VALUES ($1, $2, $3, $4)
                ON CONFLICT (org_id, anio, tipo)
@@ -115,7 +134,7 @@ async function migrateOrgData() {
           const sedesData = JSON.parse(fs.readFileSync(sedesPath, 'utf-8'));
           if (sedesData.sedes) {
             for (const sede of sedesData.sedes) {
-              await sql(
+              await q(
                 `INSERT INTO sedes (id, org_id, anio, nombre, direccion)
                  VALUES ($1, $2, $3, $4, $5)
                  ON CONFLICT (id) DO NOTHING`,
@@ -149,7 +168,7 @@ async function migrateUsers() {
 
   for (const row of parsed.data) {
     try {
-      await sql(
+      await q(
         `INSERT INTO users (id, email, nombre, password_hash, role, org_id, plan, active)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          ON CONFLICT (id) DO NOTHING`,
@@ -184,7 +203,7 @@ async function migrateAuditLog() {
 
   for (const row of parsed.data) {
     try {
-      await sql(
+      await q(
         `INSERT INTO audit_log (id, user_id, org_id, accion, entidad_tipo, entidad_id, created_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
          ON CONFLICT (id) DO NOTHING`,
@@ -202,31 +221,72 @@ async function migrateAuditLog() {
   console.log(`  ✓ ${count} registros de auditoría migrados`);
 }
 
+async function migrateStaticData() {
+  console.log('');
+  console.log('📋 Subiendo datos estáticos a PostgreSQL...');
+
+  const staticFiles = [
+    { key: 'emission_factors', file: 'emission_factors.json', version: 'V.31' },
+    { key: 'dropdowns', file: 'dropdowns.json', version: '1.0' },
+  ];
+
+  for (const { key, file, version } of staticFiles) {
+    const filePath = path.join(ROOT, 'data', file);
+    if (!fs.existsSync(filePath)) {
+      console.log(`  ⚠ ${file} no encontrado`);
+      continue;
+    }
+
+    try {
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      await q(
+        `INSERT INTO static_data (key, data, version, updated_at)
+         VALUES ($1, $2, $3, NOW())
+         ON CONFLICT (key)
+         DO UPDATE SET data = $2, version = $3, updated_at = NOW()`,
+        [key, JSON.stringify(data), version]
+      );
+      const sizeKB = (Buffer.byteLength(JSON.stringify(data)) / 1024).toFixed(1);
+      console.log(`  ✓ ${key} → ${sizeKB} KB (versión ${version})`);
+    } catch (err) {
+      console.warn(`  ❌ Error subiendo ${file}: ${err.message}`);
+    }
+  }
+}
+
 async function showStats() {
-  const sizeRow = await sql('SELECT pg_database_size(current_database()) as size');
-  const countRow = await sql('SELECT COUNT(*) as count FROM org_year_data');
-  const sizeMB = (parseInt(sizeRow[0].size) / 1024 / 1024).toFixed(2);
-  const rows = countRow[0].count;
+  const sizeRows = await q('SELECT pg_database_size(current_database()) as size');
+  const countRows = await q('SELECT COUNT(*) as count FROM org_year_data');
+  const staticRows = await q('SELECT key, version, pg_column_size(data) as bytes FROM static_data');
+  
+  const sizeMB = (parseInt(sizeRows[0].size) / 1024 / 1024).toFixed(2);
+  const rows = countRows[0].count;
   
   console.log('');
   console.log(`📊 Estado de la BBDD:`);
-  console.log(`   Tamaño: ${sizeMB} MB / 400 MB (límite soft) / 512 MB (Neon free tier)`);
+  console.log(`   Tamaño total: ${sizeMB} MB / 400 MB (límite app) / 512 MB (Neon free tier)`);
   console.log(`   Filas en org_year_data: ${rows}`);
-  console.log(`   Uso: ${((parseInt(sizeRow[0].size) / (400 * 1024 * 1024)) * 100).toFixed(1)}%`);
+  console.log(`   Uso: ${((parseInt(sizeRows[0].size) / (400 * 1024 * 1024)) * 100).toFixed(1)}%`);
+  
+  if (staticRows.length > 0) {
+    console.log(`   Datos estáticos:`);
+    for (const row of staticRows) {
+      console.log(`     · ${row.key} v${row.version} — ${(row.bytes / 1024).toFixed(1)} KB`);
+    }
+  }
 }
 
 // ─── Main ───
 async function main() {
   console.log('');
   console.log('🚀 Migración a Neon PostgreSQL');
-  console.log('   Proyecto: orange-mountain-06310787');
   console.log('');
 
   // 1. Test connection
   console.log('🔌 Conectando a Neon...');
   try {
-    const versionRow = await sql('SELECT version()');
-    console.log(`  ✓ Conectado: ${versionRow[0].version.substring(0, 50)}...`);
+    const versionRows = await q('SELECT version()');
+    console.log(`  ✓ Conectado: ${versionRows[0].version.substring(0, 55)}...`);
   } catch (err) {
     console.error(`  ❌ Error de conexión: ${err.message}`);
     process.exit(1);
@@ -242,11 +302,14 @@ async function main() {
   await migrateUsers();
   await migrateAuditLog();
 
-  // 4. Stats
+  // 4. Static data (emission factors + dropdowns → cloud)
+  await migrateStaticData();
+
+  // 5. Stats
   await showStats();
 
   console.log('');
-  console.log('✅ Migración completada. La app ahora usa PostgreSQL (Neon).');
+  console.log('✅ Migración completada. Todo en la nube (Neon PostgreSQL).');
   console.log('');
 }
 

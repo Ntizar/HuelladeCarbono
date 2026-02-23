@@ -35,16 +35,15 @@ export function getSQL(): QueryFn {
 
 /**
  * Ejecuta una query raw con parámetros posicionales ($1, $2...).
- * Wrapper simple para logging en desarrollo.
+ * Usa sql.query() que es la API correcta para queries parametrizadas.
  */
 export async function query<T = Record<string, unknown>>(
   text: string,
   params: unknown[] = []
 ): Promise<T[]> {
   const sql = getSQL();
-  // neon() acepta tagged templates o llamadas directas (string, params)
-  const result = await (sql as any)(text, params);
-  return result as T[];
+  const result = await sql.query(text, params);
+  return ((result as any).rows ?? result) as T[];
 }
 
 /**

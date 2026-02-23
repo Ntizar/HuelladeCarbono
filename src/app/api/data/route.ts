@@ -54,9 +54,9 @@ export async function GET(request: NextRequest) {
       case 'all_raw':
         return NextResponse.json(await pgStore.loadAllOrgData(orgId, anio));
       case 'factors':
-        return NextResponse.json(pgStore.loadEmissionFactors());
+        return NextResponse.json(await pgStore.loadEmissionFactors());
       case 'dropdowns':
-        return NextResponse.json(pgStore.loadDropdowns());
+        return NextResponse.json(await pgStore.loadDropdowns());
       case 'years':
         return NextResponse.json(await pgStore.listOrgYears(orgId));
       case 'usage':
